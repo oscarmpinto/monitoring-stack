@@ -1,0 +1,7 @@
+# Git ignore for Docker monitoring stack
+
+.env
+*.log
+.DS_Store
+
+data/
