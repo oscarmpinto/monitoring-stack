@@ -1,0 +1,38 @@
+groups:
+  - name: infrastructure-alerts
+    rules:
+      - alert: HostHighCpuLoad
+        expr: 100 - (avg by(instance) (rate(node_cpu_seconds_total{mode="idle"}[5m])) * 100) > 80
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host CPU usage is above 80%"
+          description: "CPU usage is above 80% for more than 5 minutes."
+
+      - alert: HostHighMemoryUsage
+        expr: (1 - (node_memory_MemoryAvailable_bytes / node_memory_MemoryTotal_bytes)) * 100 > 85
+        for: 5m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Host memory usage is above 85%"
+          description: "Memory usage is above 85% for more than 5 minutes."
+
+      - alert: HostDiskAlmostFull
+        expr: (1 - (node_filesystem_avail_bytes{fstype!~"tmpfs|overlay"} / node_filesystem_size_bytes{fstype!~"tmpfs|overlay"})) * 100 > 85
+        for: 10m
+        labels:
+          severity: warning
+        annotations:
+          summary: "Disk usage is above 85%"
+          description: "One or more disks are more than 85% full."
+
+      - alert: ContainerDown
+        expr: time() - container_last_seen{container_label_composer_project!=""} > 180
+        for: 5m
+        labels:
+          severity: critical
+        annotations:
+          summary: "Container is down"
+          description: "A container has been down for more than 3 minutes."
